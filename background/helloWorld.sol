@@ -8,6 +8,10 @@ contract HelloWorld {
         store = _store; // assign the value passed in the constructor
     }
 
+    function set(uint _store) public {
+        store = _store; // assign the value passed in the function
+    }
+
     function retrieve() public view returns (uint) {
         return store; // retrieve the stored value
     }
