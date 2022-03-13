@@ -4,3 +4,6 @@
 [submodule "Will_ZKU_W2"]
 	path = Will_ZKU_W2
 	url = https://github.com/nanjiangwill/Will_ZKU_W2
+[submodule "Will_ZKU_W3"]
+	path = Will_ZKU_W3
+	url = https://github.com/nanjiangwill/Will_ZKU_W3
