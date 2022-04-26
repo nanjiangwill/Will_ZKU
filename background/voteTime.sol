@@ -32,7 +32,7 @@ contract Ballot {
     constructor(bytes32[] memory proposalNames) {
         chairperson = msg.sender;
         voters[chairperson].weight = 1;
-        startTime = block.timestamp;  // initialize start time when the contract is created
+        
         // For each of the provided proposal names,
         // create a new proposal object and add it
         // to the end of the array.
@@ -45,6 +45,8 @@ contract Ballot {
                 voteCount: 0
             }));
         }
+
+        startTime = block.timestamp;  // initialize start time when the contract is created
     }
 
     modifier voteEnded() {
