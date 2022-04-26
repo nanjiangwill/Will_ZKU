@@ -19,7 +19,7 @@ contract Ballot {
     }
 
     address public chairperson;
-
+    
     // This declares a state variable that
     // stores a `Voter` struct for each possible address.
     mapping(address => Voter) public voters;
@@ -27,11 +27,12 @@ contract Ballot {
     // A dynamically-sized array of `Proposal` structs.
     Proposal[] public proposals;
 
+    uint256 public startTime;
     /// Create a new ballot to choose one of `proposalNames`.
     constructor(bytes32[] memory proposalNames) {
         chairperson = msg.sender;
         voters[chairperson].weight = 1;
-
+        startTime = block.timestamp;  // initialize start time when the contract is created
         // For each of the provided proposal names,
         // create a new proposal object and add it
         // to the end of the array.
@@ -46,11 +47,15 @@ contract Ballot {
         }
     }
 
+    modifier voteEnded() {
+        // check if the time is larger than 5 mins from the time the contract is created
+        require(block.timestamp < startTime + 5 minutes, "pass the time"); 
+        _;
+    }
+
     // Give `voter` the right to vote on this ballot.
     // May only be called by `chairperson`.
-    // To do more things in one transaction, we can change the vote state for
-    // list of people so that we can save gas fee
-    function giveRightToVote(address[] memory newVoters) external {
+    function giveRightToVote(address voter) external {
         // If the first argument of `require` evaluates
         // to `false`, execution terminates and all
         // changes to the state and to Ether balances
@@ -65,14 +70,12 @@ contract Ballot {
             msg.sender == chairperson,
             "Only chairperson can give right to vote."
         );
-        for(uint i=0; i< newVoters.length; i++) { // loop on all new voters
-            require(
-                !voters[newVoters[i]].voted,
-                "The voter already voted."
-            );
-            require(voters[newVoters[i]].weight == 0);
-            voters[newVoters[i]].weight = 1;
-        }
+        require(
+            !voters[voter].voted,
+            "The voter already voted."
+        );
+        require(voters[voter].weight == 0);
+        voters[voter].weight = 1;
     }
 
     /// Delegate your vote to the voter `to`.
@@ -116,7 +119,7 @@ contract Ballot {
 
     /// Give your vote (including votes delegated to you)
     /// to proposal `proposals[proposal].name`.
-    function vote(uint proposal) external {
+    function vote(uint proposal) external voteEnded {
         Voter storage sender = voters[msg.sender];
         require(sender.weight != 0, "Has no right to vote");
         require(!sender.voted, "Already voted.");
